@@ -1,5 +1,6 @@
 const fs = require('fs');
 const http = require('http');
+const url = require('url');
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,8 +35,18 @@ const http = require('http');
 //////////////////////////////////////////////////////////////////////////////////////////////
 //server 🍕🍔🍟
 const server = http.createServer((req, res) => {
-    console.log(req);
-    res.end('Hello from the server!');
+    const patName = req.url;
+    if (patName === '/' || patName === '/overview') {
+        res.end('This is the OVERVIEW');
+    } else if (patName === '/product') {
+        res.end('This is the product');
+    } else {
+        res.writeHead(404, {
+            'Content-type': 'text/html',
+            'my-own-header': 'hello-world'
+        });
+        res.end('<h1>This page can not be found!!!☠️☠️☠️</h1>')
+    }
 });
 
 server.listen(8000, '127.0.0.1', () => {
