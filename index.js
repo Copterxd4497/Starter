@@ -36,7 +36,7 @@ const url = require('url');
 //server 🍕🍔🍟
 
 const data = fs.readFile(`${__dirname}/dev-data/data.json`, 'utf-8');
-const productData = JSON.parse(data);
+const dataObj = JSON.parse(data);
 
 
 const server = http.createServer((req, res) => {
