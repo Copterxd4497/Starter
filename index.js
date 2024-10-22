@@ -48,32 +48,40 @@ const replaceTemplate = (temp, product) => {
     if (!product.organic) output = output.replace(/{%NOT_ORGANIC%}/g, 'not-organic');
     return output;
 };
-const tempCard = fs.readFileSync(`${__dirname}/templates/templates-card.html`, 'utf-8');
-const tempOverview = fs.readFileSync(`${__dirname}/templates/templates-overview.html`, 'utf-8');
-const tempProduct = fs.readFileSync(`${__dirname}/templates/templates-product.html`, 'utf-8');
+const tempCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8');
+const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8');
+const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8');
 
-const data = fs.readFile(`${__dirname}/dev-data/data.json`, 'utf-8');
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 const dataObj = JSON.parse(data);
 
 
 const server = http.createServer((req, res) => {
     const patName = req.url;
+
+    //Overview page
     if (patName === '/' || patName === '/overview') {
         res.writeHead(200, { 'Content-type': 'text/html' });
 
         const cardsHtml = dataObj.map(el => replaceTemplate(tempCard, el)).join('');
-        console.log(cardsHtml);
+        const output = tempOverview.replace(`{%PRODUCT_CARDS%}`, cardsHtml);
 
-        res.end(tempOverview);
-    } else if (patName === '/product') {
+        res.end(output);
+    }
+    //Product page
+    else if (patName === '/product') {
         res.end('This is the product');
-    } else if (patName == '/api') {
+    }
+    // API
+    else if (patName == '/api') {
         fs.readFile(`${__dirname}/dev-data/data.json`, 'utf-8', (err, data) => {
             const productData = JSON.parse(data);
             res.writeHead(200, { 'Content-type': 'application/json' });
             res.end(data);  // Send the parsed JSON data
         });
-    } else {
+    }
+    //Not Found
+    else {
         res.writeHead(404, {
             'Content-type': 'text/html',
             'my-own-header': 'hello-world'
