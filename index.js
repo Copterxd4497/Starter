@@ -35,6 +35,23 @@ const url = require('url');
 //////////////////////////////////////////////////////////////////////////////////////////////
 //server 🍕🍔🍟
 
+const replaceTemplate = (temp, product) => {
+    let output = temp.replace(/{%PRODUCTNAME%}/g, product.productName);
+    output = output.replace(/{%IMAGE%}/g, product.image);
+    output = output.replace(/{%PRICE%}/g, product.price);
+    output = output.replace(/{%FROM%}/g, product.from);
+    output = output.replace(/{%NUTRIENTS%}/g, product.nutrients);
+    output = output.replace(/{%QUANTITY%}/g, product.quantity);
+    output = output.replace(/{%DESCRIPTION%}/g, product.description);
+    output = output.replace(/{%ID%}/g, product.id);
+
+    if (!product.organic) output = output.replace(/{%NOT_ORGANIC%}/g, 'not-organic');
+    return output;
+};
+const tempCard = fs.readFileSync(`${__dirname}/templates/templates-card.html`, 'utf-8');
+const tempOverview = fs.readFileSync(`${__dirname}/templates/templates-overview.html`, 'utf-8');
+const tempProduct = fs.readFileSync(`${__dirname}/templates/templates-product.html`, 'utf-8');
+
 const data = fs.readFile(`${__dirname}/dev-data/data.json`, 'utf-8');
 const dataObj = JSON.parse(data);
 
@@ -42,7 +59,12 @@ const dataObj = JSON.parse(data);
 const server = http.createServer((req, res) => {
     const patName = req.url;
     if (patName === '/' || patName === '/overview') {
-        res.end('This is the OVERVIEW');
+        res.writeHead(200, { 'Content-type': 'text/html' });
+
+        const cardsHtml = dataObj.map(el => replaceTemplate(tempCard, el)).join('');
+        console.log(cardsHtml);
+
+        res.end(tempOverview);
     } else if (patName === '/product') {
         res.end('This is the product');
     } else if (patName == '/api') {
